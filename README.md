@@ -362,7 +362,3 @@ python -X utf8 scripts/manage.py stop
 ## 贡献
 
 欢迎通过 [Issues](https://github.com/jiachengwu7/enterprise-helpdesk/issues) 反馈问题或建议，也欢迎提交 Pull Request。反馈问题时，请附上复现步骤、运行环境与脱敏后的错误信息；修改代码后运行对应服务的检查。
-
-## 致谢与来源
-
-项目选题与早期学习分析参考了 [Snailclimb / interview-guide](https://github.com/Snailclimb/interview-guide)，本 README 的组织方式也参考了该项目。协知采用独立的 Java + Python + React 实现，不依赖原仓库运行。来源说明与第三方依赖边界见 [NOTICE.md](NOTICE.md)。
