@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0">
+  <mirrors>
+    <mirror>
+      <id>alimaven</id>
+      <mirrorOf>*</mirrorOf>
+      <url>https://repo.maven.apache.org/maven2</url>
+    </mirror>
+  </mirrors>
+</settings>

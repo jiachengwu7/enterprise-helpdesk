@@ -1,0 +1,8 @@
+[
+  {"user":"employee","question":"VPN E809 连接失败怎么办","expectedTitle":"IT-VPN操作手册","forbiddenTitle":"HR请假与考勤"},
+  {"user":"hr","question":"请假流程如何办理","expectedTitle":"HR请假与考勤","forbiddenTitle":"IT-VPN操作手册"},
+  {"user":"employee","question":"工单流程有哪些阶段","expectedTitle":"公共帮助中心","forbiddenTitle":"HR请假与考勤"},
+  {"user":"agent","question":"更换办公设备后如何绑定","expectedTitle":"IT-VPN操作手册"},
+  {"user":"admin","question":"考勤异常遗漏打卡如何处理","expectedTitle":"HR请假与考勤"},
+  {"user":"hr","question":"VPN E809 连接失败怎么办","expectedTitle":null,"forbiddenTitle":"IT-VPN操作手册"}
+]

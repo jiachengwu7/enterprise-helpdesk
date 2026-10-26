@@ -1,0 +1,85 @@
+{
+  "note": "6人工编写的小样本；只用于功能回归，不代表真实企业数据集性能或模型质量。",
+  "recallAtReturnedK": 1.0,
+  "permissionPassRate": 1.0,
+  "meanLatencyMs": 105.9,
+  "cases": [
+    {
+      "user": "employee",
+      "question": "VPN E809 连接失败怎么办",
+      "expectedTitle": "IT-VPN操作手册",
+      "forbiddenTitle": "HR请假与考勤",
+      "retrievedTitles": [
+        "IT-VPN操作手册"
+      ],
+      "hit": true,
+      "scopePassed": true,
+      "latencyMs": 118.9,
+      "mode": "retrieval-only"
+    },
+    {
+      "user": "hr",
+      "question": "请假流程如何办理",
+      "expectedTitle": "HR请假与考勤",
+      "forbiddenTitle": "IT-VPN操作手册",
+      "retrievedTitles": [
+        "HR请假与考勤",
+        "公共帮助中心"
+      ],
+      "hit": true,
+      "scopePassed": true,
+      "latencyMs": 99.0,
+      "mode": "retrieval-only"
+    },
+    {
+      "user": "employee",
+      "question": "工单流程有哪些阶段",
+      "expectedTitle": "公共帮助中心",
+      "forbiddenTitle": "HR请假与考勤",
+      "retrievedTitles": [
+        "IT-VPN操作手册",
+        "公共帮助中心"
+      ],
+      "hit": true,
+      "scopePassed": true,
+      "latencyMs": 57.5,
+      "mode": "retrieval-only"
+    },
+    {
+      "user": "agent",
+      "question": "更换办公设备后如何绑定",
+      "expectedTitle": "IT-VPN操作手册",
+      "retrievedTitles": [
+        "IT-VPN操作手册"
+      ],
+      "hit": true,
+      "scopePassed": true,
+      "latencyMs": 67.5,
+      "mode": "retrieval-only"
+    },
+    {
+      "user": "admin",
+      "question": "考勤异常遗漏打卡如何处理",
+      "expectedTitle": "HR请假与考勤",
+      "retrievedTitles": [
+        "HR请假与考勤",
+        "公共帮助中心"
+      ],
+      "hit": true,
+      "scopePassed": true,
+      "latencyMs": 151.3,
+      "mode": "retrieval-only"
+    },
+    {
+      "user": "hr",
+      "question": "VPN E809 连接失败怎么办",
+      "expectedTitle": null,
+      "forbiddenTitle": "IT-VPN操作手册",
+      "retrievedTitles": [],
+      "hit": null,
+      "scopePassed": true,
+      "latencyMs": 141.0,
+      "mode": "retrieval-only"
+    }
+  ]
+}

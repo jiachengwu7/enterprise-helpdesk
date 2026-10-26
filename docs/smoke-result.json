@@ -1,0 +1,13 @@
+{
+  "passed": [
+    "four-role login",
+    "unauthenticated and employee administration denied",
+    "real S3 upload/download and department document isolation",
+    "LangGraph retrieval and source citation, conversation ownership",
+    "human approval and duplicate-confirm idempotency; full ticket lifecycle and rating",
+    "version replacement and deletion remove stale retrieval evidence",
+    "conversation history persisted"
+  ],
+  "realModelAllowed": false,
+  "time": "2026-10-26T19:34:24"
+}

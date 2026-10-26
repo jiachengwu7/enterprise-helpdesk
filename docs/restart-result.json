@@ -1,0 +1,10 @@
+{
+  "passed": [
+    "opaque login token persists across restart",
+    "conversation history persists",
+    "pending proposal and LangGraph checkpoint persist",
+    "approval resumes graph after process restart",
+    "repeated approval returns same ticket"
+  ],
+  "cloudCalls": false
+}

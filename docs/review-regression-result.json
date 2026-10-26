@@ -1,0 +1,8 @@
+{
+  "passed": [
+    "revocation masks entire old assistant text, not only citations",
+    "lost Python response reconciles pending draft and turns exactly once",
+    "delete during AI outage revokes access immediately and retries physical cleanup"
+  ],
+  "cloudCalls": false
+}

@@ -1,0 +1,15 @@
+{
+  "passed": [
+    "real admin login and dashboard",
+    "all admin pages load without visible API errors",
+    "browser upload -> asynchronous READY -> delete",
+    "employee UI permissions and department document scope",
+    "real UI retrieval, citation dialog, ticket draft and approval",
+    "browser staff processing and employee rating/closure",
+    "390px mobile navigation and no horizontal page overflow"
+  ],
+  "pageErrors": [],
+  "browser": "Microsoft Edge via Playwright",
+  "screenshots": ".runtime/screenshots",
+  "time": "2026-10-26T11:36:27.578Z"
+}

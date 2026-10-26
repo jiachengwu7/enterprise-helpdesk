@@ -1,0 +1,30 @@
+{
+  "name": "enterprise-helpdesk-ui",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5180 --strictPort",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 5180 --strictPort",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "lucide-react": "^0.468.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@testing-library/react": "^16.1.0",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "jsdom": "^25.0.1",
+    "prettier": "^3.9.10",
+    "typescript": "~5.6.3",
+    "vite": "^5.4.11",
+    "vitest": "^2.1.8"
+  }
+}

@@ -1,0 +1,2 @@
+# Reproducible installation; lock captured from the verified Python 3.10 environment.
+-r requirements.lock.txt

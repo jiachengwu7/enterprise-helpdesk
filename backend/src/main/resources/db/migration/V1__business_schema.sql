@@ -1,0 +1,14 @@
+CREATE TABLE hd_users (id varchar(36) PRIMARY KEY, username varchar(80) NOT NULL UNIQUE, display_name varchar(100) NOT NULL, department_id varchar(8) NOT NULL, role varchar(16) NOT NULL, password_hash varchar(100) NOT NULL);
+CREATE TABLE hd_sessions (id varchar(64) PRIMARY KEY, user_id varchar(36) NOT NULL REFERENCES hd_users(id), expires_at timestamp with time zone NOT NULL);
+CREATE INDEX hd_sessions_expiry ON hd_sessions(expires_at);
+CREATE TABLE hd_documents (id varchar(36) PRIMARY KEY, title varchar(200) NOT NULL, filename varchar(255) NOT NULL, department_id varchar(8) NOT NULL, visibility varchar(16) NOT NULL, version integer NOT NULL, status varchar(16) NOT NULL, chunk_count integer NOT NULL, error varchar(500), index_mode varchar(32), active boolean NOT NULL, index_accepted boolean NOT NULL, created_at timestamp with time zone NOT NULL);
+CREATE INDEX hd_documents_scope ON hd_documents(active, department_id, visibility);
+CREATE TABLE hd_conversations (id varchar(36) PRIMARY KEY, owner_id varchar(36) NOT NULL REFERENCES hd_users(id), title varchar(200) NOT NULL, pending_json text, created_at timestamp with time zone NOT NULL, updated_at timestamp with time zone NOT NULL);
+CREATE INDEX hd_conversations_owner ON hd_conversations(owner_id);
+CREATE TABLE hd_messages (id varchar(36) PRIMARY KEY, conversation_id varchar(36) NOT NULL REFERENCES hd_conversations(id), role varchar(16) NOT NULL, content text NOT NULL, sources_json text NOT NULL, proposal_json text, created_at timestamp with time zone NOT NULL);
+CREATE INDEX hd_messages_conversation ON hd_messages(conversation_id,created_at);
+CREATE TABLE hd_tickets (id varchar(36) PRIMARY KEY, number varchar(40) NOT NULL UNIQUE, title varchar(200) NOT NULL, description text NOT NULL, priority varchar(16) NOT NULL, status varchar(16) NOT NULL, department_id varchar(8) NOT NULL, creator_id varchar(36) NOT NULL REFERENCES hd_users(id), assignee_id varchar(36) REFERENCES hd_users(id), resolution text, rating integer, idempotency_key varchar(160) NOT NULL, created_at timestamp with time zone NOT NULL, updated_at timestamp with time zone NOT NULL, CONSTRAINT hd_ticket_idempotency UNIQUE(creator_id,idempotency_key));
+CREATE INDEX hd_tickets_scope ON hd_tickets(creator_id,department_id);
+CREATE TABLE hd_comments (id varchar(36) PRIMARY KEY, ticket_id varchar(36) NOT NULL REFERENCES hd_tickets(id), author_id varchar(36) NOT NULL REFERENCES hd_users(id), content text NOT NULL, created_at timestamp with time zone NOT NULL);
+CREATE TABLE hd_decisions (id varchar(36) PRIMARY KEY, conversation_id varchar(36) NOT NULL REFERENCES hd_conversations(id), approved boolean NOT NULL, ticket_id varchar(36) REFERENCES hd_tickets(id), resumed boolean NOT NULL, answer text, created_at timestamp with time zone NOT NULL);
+CREATE INDEX hd_decisions_conversation ON hd_decisions(conversation_id);
