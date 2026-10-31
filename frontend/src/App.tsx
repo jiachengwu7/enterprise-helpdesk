@@ -48,6 +48,11 @@ const navigation = [
   { id: "system", title: "系统状态", icon: Activity },
   { id: "users", title: "用户管理", icon: Users },
 ] as const;
+/**
+ * 用途：管理登录态、导航和各业务页面入口。
+ * 输入：无显式参数，使用浏览器令牌及 API。
+ * 输出：应用根组件的 JSX；加载身份并监听过期事件。
+ */
 export default function App() {
   const [user, setUser] = useState<User | null>(null),
     [restoring, setRestoring] = useState(!!getToken()),
@@ -68,6 +73,11 @@ export default function App() {
         .finally(() => {
           if (live) setRestoring(false);
         });
+    /**
+     * 用途：响应全局登录过期事件。
+     * 输入：无参数。
+     * 输出：void；清理当前用户并显示登录提示。
+     */
     const expired = () => {
       setUser(null);
       setAuthError("会话已过期，请重新登录。");
@@ -82,14 +92,29 @@ export default function App() {
     () => (user ? api("/departments") : Promise.resolve([])),
     [user?.id],
   );
+  /**
+   * 用途：切换业务页面。
+   * 输入：target：页面标识。
+   * 输出：void；更新当前页面并收起移动端菜单。
+   */
   const go = (target: Page) => {
     setPage(target);
     setMobile(false);
   };
+  /**
+   * 用途：导航到指定工单详情。
+   * 输入：id：工单 ID。
+   * 输出：void；更新页面和选中工单。
+   */
   const openTicket = (id: string) => {
     setTicketId(id);
     go("tickets");
   };
+  /**
+   * 用途：撤销服务端登录并清理前端状态。
+   * 输入：无参数，读取当前令牌。
+   * 输出：Promise<void>；清理登录态。
+   */
   const logout = async () => {
     try {
       await post("/auth/logout", {});
@@ -243,6 +268,11 @@ export default function App() {
     </div>
   );
 }
+/**
+ * 用途：渲染登录表单并处理输入状态。
+ * 输入：initialError：初始提示；onLogin：登录成功回调。
+ * 输出：登录页面 JSX。
+ */
 function Login({
   initialError,
   onLogin,
@@ -254,6 +284,11 @@ function Login({
     [password, setPassword] = useState(""),
     [error, setError] = useState(initialError),
     [busy, setBusy] = useState(false);
+  /**
+   * 用途：提交账号密码并传递登录后的用户。
+   * 输入：e：表单事件；账号密码来自组件状态。
+   * 输出：Promise<void>；保存令牌并调用 onLogin，失败显示提示。
+   */
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     setBusy(true);
@@ -360,6 +395,11 @@ function Login({
     </div>
   );
 }
+/**
+ * 用途：展示当前用户可见的数据概览。
+ * 输入：user：用户；go：页面导航；openTicket：工单跳转。
+ * 输出：概览页面 JSX；请求统计数据。
+ */
 function Overview({
   user,
   go,

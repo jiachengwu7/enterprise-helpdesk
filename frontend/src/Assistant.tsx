@@ -23,6 +23,11 @@ import type {
   Ticket as TicketType,
 } from "./types";
 import { Badge, ErrorBox, Loading, Modal, formatDate, useLoad } from "./ui";
+/**
+ * 用途：管理问答历史、来源预览与工单确认。
+ * 输入：openTicket：跳转到指定工单的回调。
+ * 输出：知识助手页面 JSX；加载会话和模型配置状态。
+ */
 export default function Assistant({
   openTicket,
 }: {
@@ -46,7 +51,13 @@ export default function Assistant({
   useEffect(() => {
     bottom.current?.scrollIntoView?.({ behavior: "smooth" });
   }, [detail?.messages.length, busy]);
+  /**
+   * 用途：加载指定会话并忽略过时响应。
+   * 输入：id：会话 ID。
+   * 输出：Promise<void>；更新消息、草稿及加载状态。
+   */
   const select = async (id: string) => {
+    // 请求序号存在 useRef 中且不触发渲染；快速切换会话时，旧响应不能覆盖新会话。
     const call = ++version.current;
     setSelected(id);
     setDetail(null);
@@ -63,6 +74,11 @@ export default function Assistant({
       if (call === version.current) setLoading(false);
     }
   };
+  /**
+   * 用途：切换为空白会话并使旧加载响应失效。
+   * 输入：无参数。
+   * 输出：void；重置选中会话和输入状态，不删除历史。
+   */
   const fresh = () => {
     version.current++;
     setSelected(null);
@@ -73,6 +89,11 @@ export default function Assistant({
     setError("");
     setLoading(false);
   };
+  /**
+   * 用途：发送问题，必要时先创建会话。
+   * 输入：e：表单事件；问题与草稿开关来自状态。
+   * 输出：Promise<void>；更新回答与历史，失败时尝试恢复待确认状态。
+   */
   const send = async (e: FormEvent) => {
     e.preventDefault();
     if (!question.trim() || busy) return;
@@ -88,6 +109,7 @@ export default function Assistant({
         setSelected(id);
       }
       const answer = await post<Answer>(`/conversations/${id}/messages`, {
+        // requestTicket 仅请求生成草稿；此时尚未创建工单，后续还要由用户确认。
         question: question.trim(),
         requestTicket,
       });
@@ -107,7 +129,13 @@ export default function Assistant({
       setBusy(false);
     }
   };
+  /**
+   * 用途：将人工确认决定提交给 Java。
+   * 输入：approved：批准或拒绝。
+   * 输出：Promise<void>；刷新草稿与历史，记录已创建工单。
+   */
   const confirm = async (approved: boolean) => {
+    // 只提交草稿 ID 和决定，工单内容从后端已保存的草稿读取，避免前端篡改后直接落库。
     if (!selected || !detail?.pendingProposal) return;
     setBusy(true);
     setError("");
@@ -125,6 +153,11 @@ export default function Assistant({
       setBusy(false);
     }
   };
+  /**
+   * 用途：删除用户选中的会话。
+   * 输入：无参数，读取 deleting 状态。
+   * 输出：Promise<void>；删除后刷新列表并清理当前选择。
+   */
   const remove = async () => {
     if (!deleting) return;
     setBusy(true);
@@ -140,6 +173,7 @@ export default function Assistant({
     }
   };
   const modelConfigured = system.data?.ai.modelConfigured === true;
+  // “已配置”仅用于状态提示；本次是否真的调用模型，要看回答中的 mode 字段。
   const aiUnavailable = system.data?.ai.status === "unavailable";
   const modeKnown = typeof system.data?.ai.modelConfigured === "boolean";
   return (
@@ -280,26 +314,12 @@ export default function Assistant({
                       <time>{formatDate(m.createdAt)}</time>
                     </div>
                     <div className="message-content">{m.content}</div>
-                    {m.sources?.length > 0 && (
-                      <div className="source-cards">
-                        <span className="source-heading">
-                          参考来源 · {m.sources.length}
-                        </span>
-                        {m.sources.map((s, i) => (
-                          <button
-                            key={`${s.documentId}-${s.chunkIndex}-${i}`}
-                            className="source-card"
-                            onClick={() => setSource(s)}
-                          >
-                            <span className="source-number">{i + 1}</span>
-                            <FileText size={16} />
-                            <strong>{s.title}</strong>
-                            <span>
-                              v{s.version} · 分段 {s.chunkIndex + 1}
-                            </span>
-                          </button>
-                        ))}
-                      </div>
+                    {m.role === "assistant" && (
+                      <CitedSources
+                        content={m.content}
+                        sources={m.sources}
+                        onSelect={setSource}
+                      />
                     )}
                   </div>
                 </article>
@@ -495,6 +515,56 @@ export default function Assistant({
     </div>
   );
 }
+/**
+ * 用途：只展示正文实际引用的候选片段，保留原编号。
+ * 输入：content：正文；sources：候选列表；onSelect：预览回调。
+ * 输出：来源卡片 JSX；没有有效引用时 null。
+ */
+function CitedSources({
+  content,
+  sources,
+  onSelect,
+}: {
+  content: string;
+  sources: Source[];
+  onSelect: (source: Source) => void;
+}) {
+  // sources 是交给模型的全部候选，不代表正文实际引用了每一项。
+  // 只展示正文 [n] 对应的片段，并保留原编号：只引用 [2] 时不能把卡片改成 [1]。
+  // 不修改原始候选列表，后端仍需用它复核权限与版本；历史消息也通过此处展示。
+  const numbers = new Set(
+    Array.from(content.matchAll(/\[(\d+)\]/g), (match) => Number(match[1])),
+  );
+  const cited = (sources ?? [])
+    .map((source, index) => ({ source, number: index + 1 }))
+    .filter(({ number }) => numbers.has(number));
+  if (!cited.length) return null;
+  return (
+    <div className="source-cards">
+      <span className="source-heading">参考来源 · {cited.length}</span>
+      {cited.map(({ source, number }) => (
+        <button
+          key={`${source.documentId}-${source.chunkIndex}-${number}`}
+          className="source-card"
+          onClick={() => onSelect(source)}
+        >
+          <span className="source-number">{number}</span>
+          <FileText size={16} />
+          <strong>{source.title}</strong>
+          <span>
+            v{source.version} · 分段 {source.chunkIndex + 1}
+          </span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * 用途：渲染建议问题卡片的箭头。
+ * 输入：无参数。
+ * 输出：箭头 JSX。
+ */
 function ArrowIcon() {
   return <span className="prompt-arrow">↗</span>;
 }

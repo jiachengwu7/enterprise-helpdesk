@@ -19,6 +19,11 @@ public class AiClient {
   private final String base, token;
   private final ObjectMapper json;
 
+  /**
+   * 用途：初始化内部 HTTP 客户端的目标地址与认证配置。
+   * 输入：base：Python 服务地址；token：内部服务令牌；json：JSON 编解码器。
+   * 输出：构造函数，无返回值；建立实例内部状态。
+   */
   AiClient(
       @Value("${app.ai.base-url}") String base,
       @Value("${app.ai.token}") String token,
@@ -28,6 +33,11 @@ public class AiClient {
     this.json = json;
   }
 
+  /**
+   * 用途：向 Python 发送 JSON 请求并解码业务响应。
+   * 输入：path：内部路径；body：请求对象；type：响应类型。
+   * 输出：类型化响应；失败转换为安全业务异常。
+   */
   public <T> T post(String path, Object body, Class<T> type) {
     try {
       return json.readValue(call("POST", path, json.writeValueAsBytes(body)), type);
@@ -38,14 +48,29 @@ public class AiClient {
     }
   }
 
+  /**
+   * 用途：调用 Python 删除接口。
+   * 输入：path：内部资源路径。
+   * 输出：void；发生远程删除副作用。
+   */
   public void delete(String path) {
     call("DELETE", path, null);
   }
 
+  /**
+   * 用途：下载 Python 存储的文档原件。
+   * 输入：id：文档 ID。
+   * 输出：文件字节数组。
+   */
   public byte[] download(String id) {
     return call("GET", "/internal/documents/" + id + "/download", null);
   }
 
+  /**
+   * 用途：探测 Python 健康状态并隐藏连接异常细节。
+   * 输入：无参数，使用配置的服务地址。
+   * 输出：状态映射；失败时返回不可用状态。
+   */
   public Map<String, Object> health() {
     try {
       JsonNode node = json.readTree(call("GET", "/health", null));
@@ -67,6 +92,11 @@ public class AiClient {
     }
   }
 
+  /**
+   * 用途：统一发送带服务令牌和超时的内部 HTTP 请求。
+   * 输入：method、path：方法及路径；body：可空请求字节。
+   * 输出：响应字节；非成功状态转为业务异常。
+   */
   private byte[] call(String method, String path, byte[] body) {
     try {
       if (path.startsWith("/internal/") && token.isBlank()) throw unavailable();

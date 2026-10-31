@@ -7,8 +7,18 @@ import java.time.Instant;
 import java.util.UUID;
 
 public final class Entities {
+  /**
+   * 用途：禁止外部实例化静态定义容器。
+   * 输入：无参数。
+   * 输出：构造函数，无返回值；建立实例内部状态。
+   */
   private Entities() {}
 
+  /**
+   * 用途：生成实体主键。
+   * 输入：无参数。
+   * 输出：随机 UUID 字符串。
+   */
   static String id() {
     return UUID.randomUUID().toString();
   }

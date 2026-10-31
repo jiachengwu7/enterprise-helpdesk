@@ -25,6 +25,11 @@ import {
   formatDate,
   useLoad,
 } from "./ui";
+/**
+ * 用途：展示工单列表及详情切换入口。
+ * 输入：user：用户；initialId：可空初始工单；clearInitial：清理初始选择回调。
+ * 输出：工单页面 JSX。
+ */
 export default function Tickets({
   user,
   initialId,
@@ -201,6 +206,11 @@ export default function Tickets({
     </>
   );
 }
+/**
+ * 用途：渲染手动创建工单的弹窗。
+ * 输入：onClose：关闭回调；onCreated：接收新工单的回调。
+ * 输出：创建表单 JSX；为本次创建意图保留幂等键。
+ */
 function CreateTicket({
   onClose,
   onCreated,
@@ -208,12 +218,19 @@ function CreateTicket({
   onClose: () => void;
   onCreated: (t: Ticket) => void;
 }) {
+  // 弹窗的一次挂载对应一次创建意图，useState 保留幂等键，重复提交时不会重新生成。
+  // 关闭再新建会得到新键；同一键修改内容后重试，后端会拒绝以避免歧义。
   const [title, setTitle] = useState(""),
     [description, setDescription] = useState(""),
     [priority, setPriority] = useState("MEDIUM"),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [idempotencyKey] = useState(() => crypto.randomUUID());
+  /**
+   * 用途：提交工单并复用当前幂等键。
+   * 输入：e：表单事件；标题、描述、优先级来自状态。
+   * 输出：Promise<void>；成功调用 onCreated，失败显示提示。
+   */
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     setBusy(true);
@@ -287,6 +304,11 @@ function CreateTicket({
     </Modal>
   );
 }
+/**
+ * 用途：展示单张工单、评论和可用操作。
+ * 输入：id：工单 ID；user：用户；onBack：返回回调。
+ * 输出：工单详情 JSX；请求详情和可选处理人。
+ */
 function TicketView({
   id,
   user,
@@ -311,6 +333,11 @@ function TicketView({
   useEffect(() => {
     setAssignee(detail.data?.assigneeId || "");
   }, [detail.data?.assigneeId]);
+  /**
+   * 用途：提交工单状态或处理人变更。
+   * 输入：body：PATCH 字段对象。
+   * 输出：Promise<void>；成功刷新详情并关闭操作弹窗。
+   */
   const update = async (body: Record<string, unknown>) => {
     setBusy(true);
     setError("");
@@ -327,6 +354,11 @@ function TicketView({
       setBusy(false);
     }
   };
+  /**
+   * 用途：提交非空评论并刷新详情。
+   * 输入：e：表单事件；comment：组件内的评论状态。
+   * 输出：Promise<void>；成功后清空输入并刷新。
+   */
   const sendComment = async (e: FormEvent) => {
     e.preventDefault();
     if (!comment.trim()) return;

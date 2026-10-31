@@ -17,6 +17,9 @@ class DocumentRequest(StrictModel):
     version: int = Field(ge=1)
     contentBase64: str = Field(max_length=14_000_000)
 
+    # 用途：校验文件名不携带路径且格式受支持。
+    # 输入：value：文件名；cls：由 Pydantic 提供的模型类。
+    # 输出：原文件名；非法时抛 ValueError。
     @field_validator("filename")
     @classmethod
     def filename_safe(cls, value):
@@ -29,6 +32,9 @@ class DocumentRequest(StrictModel):
             raise ValueError("不支持的文件名或格式")
         return value
 
+    # 用途：校验 Base64 文件内容非空且不超过 10 MB。
+    # 输入：value：Base64 字符串；cls：模型类。
+    # 输出：原 Base64 字符串；编码或大小非法时抛 ValueError。
     @field_validator("contentBase64")
     @classmethod
     def valid_content(cls, value):
@@ -63,6 +69,9 @@ class ConfirmRequest(StrictModel):
     ticketId: UUID | None = None
     ticketNumber: str | None = Field(default=None, max_length=100)
 
+    # 用途：校验批准决定与 Java 工单结果一致。
+    # 输入：self：已解析的确认请求模型。
+    # 输出：校验后的请求自身；批准缺工单或拒绝带工单时抛 ValueError。
     @model_validator(mode="after")
     def decision_valid(self):
         if self.approved and (not self.ticketId or not self.ticketNumber):

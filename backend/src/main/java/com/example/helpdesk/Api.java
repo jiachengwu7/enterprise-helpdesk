@@ -6,6 +6,11 @@ import java.util.List;
 
 /** Browser and internal boundary types; persistence entities never cross the API. */
 public final class Api {
+  /**
+   * 用途：禁止外部实例化静态定义容器。
+   * 输入：无参数。
+   * 输出：构造函数，无返回值；建立实例内部状态。
+   */
   private Api() {}
 
   public enum Role {
@@ -33,6 +38,11 @@ public final class Api {
   }
 
   public record Envelope<T>(int code, String message, T data) {
+    /**
+     * 用途：包装成功的业务数据。
+     * 输入：data：泛型业务结果。
+     * 输出：code=200 的 Envelope。
+     */
     static <T> Envelope<T> ok(T data) {
       return new Envelope<>(200, "success", data);
     }
@@ -98,6 +108,11 @@ public final class Api {
   public record NewConversation(@Size(max = 200) String title) {}
 
   public record Question(@NotBlank @Size(max = 4000) String question, Boolean requestTicket) {
+    /**
+     * 用途：为缺省的工单草稿开关提供默认值。
+     * 输入：question：问题；requestTicket：可空布尔值。
+     * 输出：构造函数，无返回值；将 null 归一为 false。
+     */
     public Question {
       requestTicket = Boolean.TRUE.equals(requestTicket);
     }

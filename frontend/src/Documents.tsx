@@ -25,6 +25,11 @@ import {
   formatDate,
   useLoad,
 } from "./ui";
+/**
+ * 用途：展示知识库并提供筛选、上传和删除入口。
+ * 输入：user：当前用户；departments：部门选项。
+ * 输出：知识库页面 JSX；有处理中任务时轮询索引状态。
+ */
 export default function Documents({
   user,
   departments,
@@ -40,6 +45,7 @@ export default function Documents({
     [busy, setBusy] = useState(false),
     [error, setError] = useState("");
   useEffect(() => {
+    // 上传接收成功不代表索引完成：只在有排队/处理中任务时轮询，离开页面时清理定时器。
     if (
       !list.data?.some(
         (d) => d.status === "QUEUED" || d.status === "PROCESSING",
@@ -49,6 +55,11 @@ export default function Documents({
     const timer = setInterval(() => void list.reload(), 4000);
     return () => clearInterval(timer);
   }, [list.data]);
+  /**
+   * 用途：下载所选文档并显示失败提示。
+   * 输入：d：所选文档元数据。
+   * 输出：Promise<void>；触发原件下载。
+   */
   const download = async (d: Document) => {
     setError("");
     try {
@@ -57,6 +68,11 @@ export default function Documents({
       setError(errorMessage(e));
     }
   };
+  /**
+   * 用途：删除选中的文档并刷新列表。
+   * 输入：无参数，读取 deleting 状态。
+   * 输出：Promise<void>；调用删除接口并更新界面。
+   */
   const remove = async () => {
     if (!deleting) return;
     setBusy(true);
@@ -277,6 +293,11 @@ export default function Documents({
     </>
   );
 }
+/**
+ * 用途：渲染新建或版本更新表单。
+ * 输入：user、departments：身份与选项；doc：可空旧文档；onClose、onSaved：回调。
+ * 输出：文档表单 JSX。
+ */
 function DocumentForm({
   user,
   departments,
@@ -298,6 +319,11 @@ function DocumentForm({
     [file, setFile] = useState<File | null>(null),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
+  /**
+   * 用途：以 multipart 表单提交文件及元数据。
+   * 输入：e：表单事件；文件和字段来自组件状态。
+   * 输出：Promise<void>；上传成功调用 onSaved，失败显示提示。
+   */
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     if (!file) {

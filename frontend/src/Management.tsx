@@ -22,9 +22,19 @@ import {
   Refresh,
   useLoad,
 } from "./ui";
+/**
+ * 用途：展示各依赖健康状态与模型配置情况。
+ * 输入：无参数。
+ * 输出：系统状态页面 JSX；读取状态 API。
+ */
 export function System() {
   const state = useLoad<SystemStatus>(() => api("/system/status"));
   const ai = state.data?.ai;
+  /**
+   * 用途：将多种健康状态表示归一为布尔值。
+   * 输入：value：接口返回的状态值。
+   * 输出：是否健康的布尔值。
+   */
   const healthy = (value: unknown) =>
     value === true ||
     ["ok", "healthy", "ready", "connected"].includes(
@@ -156,6 +166,11 @@ export function System() {
     </>
   );
 }
+/**
+ * 用途：展示用户并提供创建入口。
+ * 输入：departments：部门选项。
+ * 输出：用户管理页面 JSX。
+ */
 export function UserManagement({ departments }: { departments: Department[] }) {
   const list = useLoad<User[]>(() => api("/users"));
   const [creating, setCreating] = useState(false);
@@ -238,6 +253,11 @@ export function UserManagement({ departments }: { departments: Department[] }) {
     </>
   );
 }
+/**
+ * 用途：渲染新用户创建表单。
+ * 输入：departments：部门选项；onClose、onCreated：回调。
+ * 输出：用户表单 JSX。
+ */
 function UserForm({
   departments,
   onClose,
@@ -254,6 +274,11 @@ function UserForm({
     [role, setRole] = useState<Role>("EMPLOYEE"),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
+  /**
+   * 用途：提交新用户信息。
+   * 输入：e：表单事件；账号、密码、角色和部门来自状态。
+   * 输出：Promise<void>；成功调用 onCreated，失败显示提示。
+   */
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     setBusy(true);
